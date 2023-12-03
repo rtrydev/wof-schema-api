@@ -1,0 +1,40 @@
+service: wof-schema-api
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.10
+
+package:
+  individually: true
+  exclude:
+    - '**/*'
+
+functions:
+  getSchema:
+    handler: api.handlers.get_schema.handler
+    package:
+      include:
+        - 'api/handlers/get_schema.py'
+        - 'application/**/*'
+        - 'domain/**/*'
+        - 'infrastructure/**/*'
+    events:
+      - httpApi:
+          path: schemas/{id}
+          method: get
+  createSchema:
+    handler: api.handlers.create_schema.handler
+    events:
+      - httpApi:
+          path: schemas
+          method: post
+  updateSchema:
+    handler: api.handlers.update_schema.handler
+    events:
+      - httpApi:
+          path: schemas/{id}
+          method: put
+
+plugins:
+  - serverless-offline
