@@ -25,7 +25,7 @@ def handler(event, context):
 
     return {
         'statusCode': 200,
-        'body': json.dumps({
-            'data': dataclasses.asdict(schema)
-        })
+        'body': json.dumps(
+            dataclasses.asdict(schema)
+        )
     }
