@@ -1,5 +1,6 @@
 import dataclasses
 import json
+from typing import Optional
 
 from domain.models.element import Element
 from domain.models.schema import Schema
@@ -9,8 +10,11 @@ from domain.repositories.schema_repository import SchemaRepository
 class TXTSchemaRepository(SchemaRepository):
     FILE_NAME = 'schema_data.txt'
 
-    def get_by_id(self, schema_id: str) -> Schema:
+    def get_by_id(self, schema_id: str) -> Optional[Schema]:
         schema = self.__load_data().get(schema_id)
+
+        if schema is None:
+            return None
 
         return Schema(
             id=schema.get('id'),
@@ -21,7 +25,6 @@ class TXTSchemaRepository(SchemaRepository):
                 ), schema.get('elements')
             ))
         )
-
 
     def create(self, schema: Schema) -> bool:
         data = self.__load_data()
