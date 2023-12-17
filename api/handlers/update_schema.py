@@ -9,6 +9,12 @@ from application.dtos.schema.schema_write_dto import SchemaWriteDTO
 
 
 def handler(event, context):
+    user_id = event\
+        .get('requestContext', {})\
+        .get('authorizer', {})\
+        .get('lambda', {})\
+        .get('user_id')
+
     if not inject.is_configured():
         inject.configure(di_config)
 
@@ -20,6 +26,8 @@ def handler(event, context):
     event_body = json.loads(event.get('body') or '{}')
 
     schema = SchemaWriteDTO(
+        name=event_body.get('name'),
+        owner_id=user_id,
         elements=list(map(
             lambda element: ElementWriteDTO(
                 text=element.get('text')
@@ -31,7 +39,7 @@ def handler(event, context):
 
     if not result:
         return {
-            'statusCode': 404
+            'statusCode': 403
         }
 
     return {

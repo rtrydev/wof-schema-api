@@ -3,7 +3,34 @@ frameworkVersion: '3'
 
 provider:
   name: aws
-  runtime: python3.10
+  runtime: python3.11
+  deploymentBucket:
+    name: rtrydev-serverless-deployments-${opt:region}
+  httpApi:
+    cors:
+      allowedOrigins: '*'
+      allowedHeaders:
+        - Content-Type
+        - X-Amz-Date
+        - Authorization
+        - X-Api-Key
+        - X-Amz-Security-Token
+        - X-Amz-User-Agent
+    authorizers:
+      wofAuthorizer:
+        type: request
+        functionArn: 'arn:aws:lambda:${aws:region}:${aws:accountId}:function:wof-authorizer-dev-authorize'
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - 'dynamodb:PutItem'
+            - 'dynamodb:UpdateItem'
+            - 'dynamodb:GetItem'
+          Resource:
+            - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/wof-schemas
+            - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/wof-schemas/*
 
 package:
   individually: true
@@ -13,6 +40,8 @@ package:
 functions:
   getSchema:
     handler: api.handlers.get_schema.handler
+    layers:
+      - Ref: PythonRequirementsLambdaLayer
     package:
       include:
         - 'api/handlers/get_schema.py'
@@ -21,20 +50,44 @@ functions:
         - 'infrastructure/**/*'
     events:
       - httpApi:
-          path: schemas/{id}
+          path: /{id}
           method: get
   createSchema:
     handler: api.handlers.create_schema.handler
+    package:
+      include:
+        - 'api/handlers/create_schema.py'
+        - 'application/**/*'
+        - 'domain/**/*'
+        - 'infrastructure/**/*'
+    layers:
+      - Ref: PythonRequirementsLambdaLayer
     events:
       - httpApi:
-          path: schemas
+          path: /
           method: post
+          authorizer: wofAuthorizer
   updateSchema:
     handler: api.handlers.update_schema.handler
+    package:
+      include:
+        - 'api/handlers/update_schema.py'
+        - 'application/**/*'
+        - 'domain/**/*'
+        - 'infrastructure/**/*'
+    layers:
+      - Ref: PythonRequirementsLambdaLayer
     events:
       - httpApi:
-          path: schemas/{id}
+          path: /{id}
           method: put
+          authorizer: wofAuthorizer
+
+custom:
+  pythonRequirements:
+    layer: true
 
 plugins:
   - serverless-offline
+  - serverless-deployment-bucket
+  - serverless-python-requirements

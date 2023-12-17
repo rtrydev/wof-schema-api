@@ -1,6 +1,6 @@
 from domain.repositories.schema_repository import SchemaRepository
-from infrastructure.repositories.txt_schema_repository import TXTSchemaRepository
+from infrastructure.repositories.dynamodb_schema_repository import DynamoDBSchemaRepository
 
 
 def di_config(binder):
-    binder.bind(SchemaRepository, TXTSchemaRepository())
+    binder.bind(SchemaRepository, DynamoDBSchemaRepository())

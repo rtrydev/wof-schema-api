@@ -24,6 +24,7 @@ class SchemaController:
 
         return SchemaReadDTO(
             id=schema.id,
+            name=schema.name,
             elements=list(
                 map(lambda element: ElementReadDTO(
                     id=element.id,
@@ -37,6 +38,8 @@ class SchemaController:
 
         schema = Schema(
             id=schema_id,
+            name=schema_data.name,
+            owner_id=schema_data.owner_id,
             elements=list(map(
                 lambda element: Element(
                     id=str(uuid.uuid4()),
@@ -51,8 +54,15 @@ class SchemaController:
         return schema_id
 
     def update_schema(self, schema_id: str, schema_data: SchemaWriteDTO) -> bool:
+        existing_schema = self.schema_repository.get_by_id(schema_id)
+
+        if existing_schema is None or existing_schema.owner_id != schema_data.owner_id:
+            return False
+
         schema = Schema(
-            id=schema_id,
+            id=existing_schema.id,
+            name=schema_data.name,
+            owner_id=existing_schema.owner_id,
             elements=list(map(
                 lambda element: Element(
                     id=str(uuid.uuid4()),
