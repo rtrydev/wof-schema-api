@@ -16,6 +16,23 @@ class SchemaController:
     def __init__(self, schema_repository: SchemaRepository):
         self.schema_repository = schema_repository
 
+    def get_schemas(self, user_id: str) -> list[SchemaReadDTO]:
+        schemas = self.schema_repository.get_for_user(user_id)
+
+        return [
+            SchemaReadDTO(
+                id=schema.id,
+                name=schema.name,
+                elements=list(
+                    map(lambda element: ElementReadDTO(
+                        id=element.id,
+                        text=element.text
+                    ), schema.elements)
+                )
+            )
+            for schema in schemas
+        ]
+
     def get_schema(self, schema_id: str) -> Optional[SchemaReadDTO]:
         schema = self.schema_repository.get_by_id(schema_id)
 

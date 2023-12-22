@@ -1,4 +1,5 @@
 import boto3
+from boto3.dynamodb.conditions import Key
 from botocore.exceptions import ClientError
 
 from domain.models.element import Element
@@ -10,6 +11,28 @@ class DynamoDBSchemaRepository(SchemaRepository):
     def __init__(self):
         self.dynamodb = boto3.resource('dynamodb')
         self.table = self.dynamodb.Table('wof-schemas')
+
+    def get_for_user(self, user_id: str) -> list[Schema]:
+        try:
+            response = self.table.query(
+                IndexName='owner_id-index',
+                KeyConditionExpression=Key('owner_id').eq(user_id)
+            )
+
+            items = response.get('Items', [])
+
+            return [
+                Schema(
+                    id=item['id'],
+                    name=item['name'],
+                    owner_id=item['owner_id'],
+                    elements=[Element(**element) for element in item.get('elements', [])]
+                )
+                for item in items
+            ]
+        except ClientError as e:
+            print(f"Error fetching schema: {e}")
+        return []
 
     def get_by_id(self, schema_id: str) -> Schema:
         try:

@@ -5,6 +5,10 @@ from domain.models.schema import Schema
 
 class SchemaRepository(ABC):
     @abstractmethod
+    def get_for_user(self, user_id: str) -> list[Schema]:
+        pass
+
+    @abstractmethod
     def get_by_id(self, schema_id: str) -> Schema:
         pass
 

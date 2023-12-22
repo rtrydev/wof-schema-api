@@ -28,6 +28,7 @@ provider:
             - 'dynamodb:PutItem'
             - 'dynamodb:UpdateItem'
             - 'dynamodb:GetItem'
+            - 'dynamodb:Query'
           Resource:
             - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/wof-schemas
             - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/wof-schemas/*
@@ -38,6 +39,21 @@ package:
     - '**/*'
 
 functions:
+  getSchemas:
+    handler: api.handlers.get_schemas.handler
+    layers:
+      - Ref: PythonRequirementsLambdaLayer
+    package:
+      include:
+        - 'api/handlers/get_schemas.py'
+        - 'application/**/*'
+        - 'domain/**/*'
+        - 'infrastructure/**/*'
+    events:
+      - httpApi:
+          path: /
+          method: get
+          authorizer: wofAuthorizer
   getSchema:
     handler: api.handlers.get_schema.handler
     layers:
