@@ -6,8 +6,10 @@ import inject
 from application.dtos.element.element_read_dto import ElementReadDTO
 from application.dtos.schema.schema_read_dto import SchemaReadDTO
 from application.dtos.schema.schema_write_dto import SchemaWriteDTO
+from application.dtos.variable.variable_read_dto import VariableReadDTO
 from domain.models.element import Element
 from domain.models.schema import Schema
+from domain.models.variable import Variable
 from domain.repositories.schema_repository import SchemaRepository
 
 
@@ -28,6 +30,12 @@ class SchemaController:
                         id=element.id,
                         text=element.text
                     ), schema.elements)
+                ),
+                variables=list(
+                    map(lambda variable: VariableReadDTO(
+                        variable_name=variable.variable_name,
+                        wheel_id=variable.wheel_id
+                    ), schema.variables)
                 )
             )
             for schema in schemas
@@ -47,6 +55,12 @@ class SchemaController:
                     id=element.id,
                     text=element.text
                 ), schema.elements)
+            ),
+            variables=list(
+                map(lambda variable: VariableReadDTO(
+                    variable_name=variable.variable_name,
+                    wheel_id=variable.wheel_id
+                ), schema.variables)
             )
         )
 
@@ -62,7 +76,13 @@ class SchemaController:
                     id=str(uuid.uuid4()),
                     text=element.text
                 ), schema_data.elements
-            ))
+            )),
+            variables=list(
+                map(lambda variable: Variable(
+                    variable_name=variable.variable_name,
+                    wheel_id=variable.wheel_id
+                ), schema_data.variables)
+            )
         )
 
         if not self.schema_repository.create(schema):
@@ -85,7 +105,13 @@ class SchemaController:
                     id=str(uuid.uuid4()),
                     text=element.text
                 ), schema_data.elements
-            ))
+            )),
+            variables=list(
+                map(lambda variable: Variable(
+                    variable_name=variable.variable_name,
+                    wheel_id=variable.wheel_id
+                ), schema_data.variables)
+            )
         )
 
         return self.schema_repository.update(schema)

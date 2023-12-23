@@ -6,6 +6,7 @@ from application.config.dependency_injection import di_config
 from application.controllers.schema_controller import SchemaController
 from application.dtos.element.element_write_dto import ElementWriteDTO
 from application.dtos.schema.schema_write_dto import SchemaWriteDTO
+from application.dtos.variable.variable_write_dto import VariableWriteDTO
 
 
 def handler(event, context):
@@ -32,6 +33,12 @@ def handler(event, context):
             lambda element: ElementWriteDTO(
                 text=element.get('text')
             ), event_body.get('elements') or []
+        )),
+        variables=list(map(
+            lambda variable: VariableWriteDTO(
+                variable_name=variable.get('variable_name'),
+                wheel_id=variable.get('wheel_id')
+            ), event_body.get('variable') or []
         ))
     )
 

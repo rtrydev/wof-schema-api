@@ -4,6 +4,7 @@ from botocore.exceptions import ClientError
 
 from domain.models.element import Element
 from domain.models.schema import Schema
+from domain.models.variable import Variable
 from domain.repositories.schema_repository import SchemaRepository
 
 
@@ -26,7 +27,8 @@ class DynamoDBSchemaRepository(SchemaRepository):
                     id=item['id'],
                     name=item['name'],
                     owner_id=item['owner_id'],
-                    elements=[Element(**element) for element in item.get('elements', [])]
+                    elements=[Element(**element) for element in item.get('elements', [])],
+                    variables=[Variable(**variable) for variable in item.get('variables', [])]
                 )
                 for item in items
             ]
@@ -43,7 +45,8 @@ class DynamoDBSchemaRepository(SchemaRepository):
                     id=item['id'],
                     name=item['name'],
                     owner_id=item['owner_id'],
-                    elements=[Element(**element) for element in item.get('elements', [])]
+                    elements=[Element(**element) for element in item.get('elements', [])],
+                    variables=[Variable(**variable) for variable in item.get('variables', [])]
                 )
         except ClientError as e:
             print(f"Error fetching schema: {e}")
@@ -52,11 +55,14 @@ class DynamoDBSchemaRepository(SchemaRepository):
     def create(self, schema: Schema) -> bool:
         try:
             elements = [{'id': e.id, 'text': e.text} for e in schema.elements]
+            variables = [{'variable_name': v.variable_name, 'wheel_id': v.wheel_id} for v in schema.variables]
+
             self.table.put_item(Item={
                 'id': schema.id,
                 'name': schema.name,
                 'owner_id': schema.owner_id,
-                'elements': elements
+                'elements': elements,
+                'variables': variables
             })
             return True
         except ClientError as e:
@@ -66,15 +72,18 @@ class DynamoDBSchemaRepository(SchemaRepository):
     def update(self, schema: Schema) -> bool:
         try:
             elements = [{'id': e.id, 'text': e.text} for e in schema.elements]
+            variables = [{'variable_name': v.variable_name, 'wheel_id': v.wheel_id} for v in schema.variables]
+
             self.table.update_item(
                 Key={'id': schema.id},
-                UpdateExpression="set #wheel_name = :n, elements=:e",
+                UpdateExpression="set #wheel_name = :n, elements = :e, variables = :v",
                 ExpressionAttributeNames={
                     '#wheel_name': 'name'
                 },
                 ExpressionAttributeValues={
                     ':n': schema.name,
-                    ':e': elements
+                    ':e': elements,
+                    ':v': variables
                 }
             )
             return True
