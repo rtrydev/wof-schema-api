@@ -38,7 +38,7 @@ def handler(event, context):
             lambda variable: VariableWriteDTO(
                 variable_name=variable.get('variable_name'),
                 wheel_id=variable.get('wheel_id')
-            ), event_body.get('variable') or []
+            ), event_body.get('variables') or []
         ))
     )
 
