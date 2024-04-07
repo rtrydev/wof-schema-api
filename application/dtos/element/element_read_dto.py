@@ -5,3 +5,4 @@ from dataclasses import dataclass
 class ElementReadDTO:
     id: str
     text: str
+    locked: bool

@@ -28,7 +28,8 @@ class SchemaController:
                 elements=list(
                     map(lambda element: ElementReadDTO(
                         id=element.id,
-                        text=element.text
+                        text=element.text,
+                        locked=element.locked
                     ), schema.elements)
                 ),
                 variables=list(
@@ -53,7 +54,8 @@ class SchemaController:
             elements=list(
                 map(lambda element: ElementReadDTO(
                     id=element.id,
-                    text=element.text
+                    text=element.text,
+                    locked=element.locked
                 ), schema.elements)
             ),
             variables=list(
@@ -74,7 +76,8 @@ class SchemaController:
             elements=list(map(
                 lambda element: Element(
                     id=str(uuid.uuid4()),
-                    text=element.text
+                    text=element.text,
+                    locked=element.locked
                 ), schema_data.elements
             )),
             variables=list(
@@ -103,7 +106,8 @@ class SchemaController:
             elements=list(map(
                 lambda element: Element(
                     id=str(uuid.uuid4()),
-                    text=element.text
+                    text=element.text,
+                    locked=element.locked
                 ), schema_data.elements
             )),
             variables=list(

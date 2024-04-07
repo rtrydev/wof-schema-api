@@ -31,7 +31,8 @@ def handler(event, context):
         owner_id=user_id,
         elements=list(map(
             lambda element: ElementWriteDTO(
-                text=element.get('text')
+                text=element.get('text'),
+                locked=element.get('locked')
             ), event_body.get('elements') or []
         )),
         variables=list(map(

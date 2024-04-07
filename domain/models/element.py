@@ -5,3 +5,4 @@ from dataclasses import dataclass
 class Element:
     id: str
     text: str
+    locked: bool = False

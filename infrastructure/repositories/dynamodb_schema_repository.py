@@ -71,7 +71,7 @@ class DynamoDBSchemaRepository(SchemaRepository):
 
     def update(self, schema: Schema) -> bool:
         try:
-            elements = [{'id': e.id, 'text': e.text} for e in schema.elements]
+            elements = [{'id': e.id, 'text': e.text, 'locked': e.locked} for e in schema.elements]
             variables = [{'variable_name': v.variable_name, 'wheel_id': v.wheel_id} for v in schema.variables]
 
             self.table.update_item(
@@ -86,6 +86,7 @@ class DynamoDBSchemaRepository(SchemaRepository):
                     ':v': variables
                 }
             )
+
             return True
         except ClientError as e:
             print(f"Error updating schema: {e}")
