@@ -1,7 +1,9 @@
 import uuid
 from typing import Optional
+import dataclasses
 
 import inject
+from deepdiff import DeepDiff
 
 from application.dtos.element.element_read_dto import ElementReadDTO
 from application.dtos.schema.schema_read_dto import SchemaReadDTO
@@ -117,5 +119,26 @@ class SchemaController:
                 ), schema_data.variables)
             )
         )
+
+        diff = DeepDiff(
+            dataclasses.asdict(existing_schema),
+            dataclasses.asdict(schema),
+            exclude_regex_paths=r"root.*\['id'\]"
+        )
+        change_log = [
+            f'Change on path {key}: {value.get("old_value")} -> {value.get("new_value")}'
+            for key, value in diff.get('values_changed', {}).items()
+        ]
+        add_log = [
+            f'Added on path {key}: {element}'
+            for key, element in diff.get('iterable_item_added', {}).items()
+        ]
+        remove_log = [
+            f'Deleted on path {key}: {element}'
+            for key, element in diff.get('iterable_item_removed', {}).items()
+        ]
+
+        for log in change_log + add_log + remove_log:
+            print(log)
 
         return self.schema_repository.update(schema)
