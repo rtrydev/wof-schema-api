@@ -3,7 +3,7 @@ frameworkVersion: '3'
 
 provider:
   name: aws
-  runtime: python3.11
+  runtime: python3.12
   deploymentBucket:
     name: rtrydev-serverless-deployments-${opt:region}
   httpApi:

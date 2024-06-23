@@ -25,6 +25,7 @@ def handler(event, context):
     schema_id = path_parameters.get('id')
 
     event_body = json.loads(event.get('body') or '{}')
+    print(f'Event body: {event.get('body')}')
 
     schema = SchemaWriteDTO(
         name=event_body.get('name'),
