@@ -32,6 +32,8 @@ provider:
           Resource:
             - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/wof-schemas
             - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/wof-schemas/*
+            - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/wof-collaboration-affiliations
+            - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/wof-collaboration-affiliations/*
 
 package:
   individually: true

@@ -1,6 +1,9 @@
+from domain.repositories.collaboration_repository import CollaborationAffiliationRepository
 from domain.repositories.schema_repository import SchemaRepository
+from infrastructure.repositories.dynamodb_collaboration_repository import DynamoDBCollaborationAffiliationRepository
 from infrastructure.repositories.dynamodb_schema_repository import DynamoDBSchemaRepository
 
 
 def di_config(binder):
     binder.bind(SchemaRepository, DynamoDBSchemaRepository())
+    binder.bind(CollaborationAffiliationRepository, DynamoDBCollaborationAffiliationRepository())

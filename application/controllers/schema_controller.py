@@ -12,13 +12,15 @@ from application.dtos.variable.variable_read_dto import VariableReadDTO
 from domain.models.element import Element
 from domain.models.schema import Schema
 from domain.models.variable import Variable
+from domain.repositories.collaboration_repository import CollaborationAffiliationRepository
 from domain.repositories.schema_repository import SchemaRepository
 
 
 class SchemaController:
     @inject.autoparams()
-    def __init__(self, schema_repository: SchemaRepository):
+    def __init__(self, schema_repository: SchemaRepository, affiliation_repository: CollaborationAffiliationRepository):
         self.schema_repository = schema_repository
+        self.affiliation_repository = affiliation_repository
 
     def get_schemas(self, user_id: str) -> list[SchemaReadDTO]:
         schemas = self.schema_repository.get_for_user(user_id)
@@ -98,8 +100,17 @@ class SchemaController:
     def update_schema(self, schema_id: str, schema_data: SchemaWriteDTO) -> bool:
         existing_schema = self.schema_repository.get_by_id(schema_id)
 
-        if existing_schema is None or existing_schema.owner_id != schema_data.owner_id:
+        if existing_schema is None:
             return False
+
+        if existing_schema.owner_id != schema_data.owner_id:
+            user_affiliations = self.affiliation_repository.get_by_user_id(schema_data.owner_id)
+
+            if not any([
+                schema_id == affiliation.schema_id
+                for affiliation in user_affiliations
+            ]):
+                return False
 
         schema = Schema(
             id=existing_schema.id,
